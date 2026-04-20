@@ -325,6 +325,56 @@ export default function QuestionsList({ selectedUser, questions }) {
     loadSavedEntries();
   };
 
+  const handleDeleteEntry = async (id, type, question = '') => {
+    const confirmed = window.confirm('Na pewno usunąć ten wpis?');
+    if (!confirmed) return;
+
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    if (!isSupabaseConfigured || !supabase) {
+      setErrorMessage('Brak konfiguracji Supabase (.env).');
+      return;
+    }
+
+    const { error } = await supabase.from('entries').delete().eq('id', id);
+
+    if (error) {
+      setErrorMessage('Nie udało się usunąć wpisu.');
+      return;
+    }
+
+    setDraft((prev) => {
+      const next = {
+        ...prev,
+        questionAnswers: { ...(prev.questionAnswers || {}) },
+      };
+
+      if (type === 'question' && question) {
+        delete next.questionAnswers[question];
+      }
+
+      if (type === 'fact') {
+        next.fact = '';
+      }
+
+      if (type === 'reflection') {
+        next.reflection = '';
+      }
+
+      if (type === 'custom') {
+        next.custom_question = '';
+        next.custom_answer = '';
+      }
+
+      localStorage.setItem(draftStorageKey(selectedUser, partner), JSON.stringify(next));
+      return next;
+    });
+
+    setSuccessMessage('Wpis został usunięty.');
+    loadSavedEntries();
+  };
+
   const factPreview = shortPreview(effectiveFact);
   const reflectionPreview = shortPreview(effectiveReflection);
   const customPreview = shortPreview(effectiveCustomQuestion) || shortPreview(effectiveCustomAnswer);
@@ -343,6 +393,7 @@ export default function QuestionsList({ selectedUser, questions }) {
             <br />
             <span className="muted">{factPreview ? `Uzupełniono: ${factPreview}` : 'Nie uzupełniono'}</span>
           </button>
+
           <button type="button" className="question-card section-card" onClick={() => openForm('reflection')}>
             <strong>💭 Refleksja</strong>
             <br />
@@ -350,6 +401,7 @@ export default function QuestionsList({ selectedUser, questions }) {
               {reflectionPreview ? `Uzupełniono: ${reflectionPreview}` : 'Nie uzupełniono'}
             </span>
           </button>
+
           <button type="button" className="question-card section-card" onClick={() => openForm('custom')}>
             <strong>✍️ Własne pytanie / własna odpowiedź</strong>
             <br />
@@ -374,7 +426,9 @@ export default function QuestionsList({ selectedUser, questions }) {
                     {questionEmoji(question)} {question}
                   </strong>
                   <br />
-                  <span className="muted">{answerPreview ? `Uzupełniono: ${answerPreview}` : 'Nie uzupełniono'}</span>
+                  <span className="muted">
+                    {answerPreview ? `Uzupełniono: ${answerPreview}` : 'Nie uzupełniono'}
+                  </span>
                 </button>
               );
             })}
@@ -383,36 +437,78 @@ export default function QuestionsList({ selectedUser, questions }) {
 
         <div className="stack">
           <h2 className="page-title section-title">Dotychczas zapisane</h2>
+
           {loading ? <p className="muted">Ładowanie zapisanych wpisów...</p> : null}
+
           {!loading && !savedData.raw.length ? (
             <p className="muted">Nie ma jeszcze zapisanych wpisów dla tej osoby.</p>
           ) : null}
+
           {!loading && savedData.raw.length ? (
             <div className="entry-list">
-              {Object.entries(savedData.questionAnswers).map(([question, answer]) => (
-                <Card key={`saved-question-${question}`}>
-                  <p>
-                    <strong>Pytanie:</strong> {question}
-                  </p>
-                  <p>
-                    <strong>Odpowiedź:</strong> {answer}
-                  </p>
-                </Card>
-              ))}
+              {Object.entries(savedData.questionAnswers).map(([question, answer]) => {
+                const row = savedData.questionRowsByText[question];
+                return (
+                  <Card key={`saved-question-${question}`}>
+                    <p>
+                      <strong>Pytanie:</strong> {question}
+                    </p>
+                    <p>
+                      <strong>Odpowiedź:</strong> {answer}
+                    </p>
+
+                    {row?.id ? (
+                      <div className="actions">
+                        <Button
+                          variant="secondary"
+                          onClick={() => handleDeleteEntry(row.id, 'question', question)}
+                        >
+                          Usuń
+                        </Button>
+                      </div>
+                    ) : null}
+                  </Card>
+                );
+              })}
+
               {savedData.fact ? (
                 <Card>
                   <p>
                     <strong>Zaskakujący fakt:</strong> {savedData.fact}
                   </p>
+
+                  {savedData.factRow?.id ? (
+                    <div className="actions">
+                      <Button
+                        variant="secondary"
+                        onClick={() => handleDeleteEntry(savedData.factRow.id, 'fact')}
+                      >
+                        Usuń
+                      </Button>
+                    </div>
+                  ) : null}
                 </Card>
               ) : null}
+
               {savedData.reflection ? (
                 <Card>
                   <p>
                     <strong>Refleksja:</strong> {savedData.reflection}
                   </p>
+
+                  {savedData.reflectionRow?.id ? (
+                    <div className="actions">
+                      <Button
+                        variant="secondary"
+                        onClick={() => handleDeleteEntry(savedData.reflectionRow.id, 'reflection')}
+                      >
+                        Usuń
+                      </Button>
+                    </div>
+                  ) : null}
                 </Card>
               ) : null}
+
               {savedData.custom_question || savedData.custom_answer ? (
                 <Card>
                   {savedData.custom_question ? (
@@ -420,10 +516,22 @@ export default function QuestionsList({ selectedUser, questions }) {
                       <strong>Własne pytanie:</strong> {savedData.custom_question}
                     </p>
                   ) : null}
+
                   {savedData.custom_answer ? (
                     <p>
                       <strong>Własna odpowiedź:</strong> {savedData.custom_answer}
                     </p>
+                  ) : null}
+
+                  {savedData.customRow?.id ? (
+                    <div className="actions">
+                      <Button
+                        variant="secondary"
+                        onClick={() => handleDeleteEntry(savedData.customRow.id, 'custom')}
+                      >
+                        Usuń
+                      </Button>
+                    </div>
                   ) : null}
                 </Card>
               ) : null}
