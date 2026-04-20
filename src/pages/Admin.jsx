@@ -29,9 +29,9 @@ function createCsv(entries) {
   return [headers.join(','), ...rows].join('\n');
 }
 
-export default function Admin() {
+export default function Admin({ isAdminEmail = false }) {
   const [pinInput, setPinInput] = useState('');
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(Boolean(isAdminEmail));
   const [authError, setAuthError] = useState('');
 
   const [entries, setEntries] = useState([]);
@@ -43,6 +43,13 @@ export default function Admin() {
   const [searchText, setSearchText] = useState('');
 
   const adminPin = import.meta.env.VITE_ADMIN_PIN || '1234';
+
+  useEffect(() => {
+    if (isAdminEmail) {
+      setUnlocked(true);
+      setAuthError('');
+    }
+  }, [isAdminEmail]);
 
   const fetchEntries = async () => {
     if (!isSupabaseConfigured || !supabase) {

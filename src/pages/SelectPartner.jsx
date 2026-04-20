@@ -1,12 +1,23 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import Button from '../components/Button';
 import Card from '../components/Card';
 import Input from '../components/Input';
+import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 
-export default function SelectPartner({ users, selectedUser }) {
+function statusLabel(count) {
+  if (!count) {
+    return 'brak wpisów';
+  }
+  if (count === 1) {
+    return '1 wpis';
+  }
+  return `${count} wpisy`;
+}
+
+export default function SelectPartner({ users, selectedUser, authorEmail }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [statusByPartner, setStatusByPartner] = useState({});
 
   const partners = useMemo(() => {
     const base = users.filter((user) => user !== selectedUser);
@@ -17,18 +28,50 @@ export default function SelectPartner({ users, selectedUser }) {
     return base.filter((partner) => partner.toLowerCase().includes(normalized));
   }, [users, selectedUser, query]);
 
+  useEffect(() => {
+    if (!authorEmail || !isSupabaseConfigured || !supabase) {
+      setStatusByPartner({});
+      return;
+    }
+
+    let ignore = false;
+
+    const loadStatuses = async () => {
+      const { data, error } = await supabase
+        .from('entries')
+        .select('partner')
+        .eq('author', authorEmail);
+
+      if (ignore || error) {
+        return;
+      }
+
+      const counts = {};
+      (data || []).forEach((entry) => {
+        counts[entry.partner] = (counts[entry.partner] || 0) + 1;
+      });
+      setStatusByPartner(counts);
+    };
+
+    loadStatuses();
+
+    return () => {
+      ignore = true;
+    };
+  }, [authorEmail]);
+
   if (!selectedUser) {
     return <Navigate to="/" replace />;
   }
 
   const handlePick = (partner) => {
-    navigate(`/form?partner=${encodeURIComponent(partner)}`);
+    navigate(`/questions?partner=${encodeURIComponent(partner)}`);
   };
 
   return (
     <Card>
       <h1 className="page-title">Wybierz rozmówcę</h1>
-      <p className="page-subtitle">Wybieraj osoby spoza swojej bańki i uzupełniaj wpis po rozmowie.</p>
+      <p className="page-subtitle">Wybieraj osoby spoza swojej bańki i uzupełniaj wpisy po rozmowie.</p>
 
       <div className="stack">
         <Input
@@ -41,9 +84,16 @@ export default function SelectPartner({ users, selectedUser }) {
 
         <div className="grid partners-grid">
           {partners.map((partner) => (
-            <Button key={partner} variant="secondary" onClick={() => handlePick(partner)}>
-              {partner}
-            </Button>
+            <button
+              key={partner}
+              type="button"
+              className="question-card"
+              onClick={() => handlePick(partner)}
+            >
+              <strong>{partner}</strong>
+              <br />
+              <span className="muted">Status: {statusLabel(statusByPartner[partner] || 0)}</span>
+            </button>
           ))}
         </div>
       </div>
