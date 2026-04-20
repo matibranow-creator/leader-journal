@@ -136,8 +136,8 @@ export default function Testimony({ selectedUser }) {
       <p className="page-subtitle">
   Użytkownik:{' '}
   <strong>
-    {selectedUser === 'John Travolta'
-      ? 'John Travolta — KCM ~K'
+    {selectedUser === 'Magdalena Łabaj'
+      ? 'Magdalena Łabaj — KCM ~K'
       : selectedUser}
   </strong>
 </p>
