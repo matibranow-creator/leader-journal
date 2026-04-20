@@ -5,7 +5,7 @@ import Card from '../components/Card';
 import Input from '../components/Input';
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 
-export default function PinAccess({ selectedUser, onUnlock, onChangeUser }) {
+export default function PinAccess({ selectedUser, onPinVerified, onChangeUser }) {
   const navigate = useNavigate();
   const [pin, setPin] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -16,7 +16,8 @@ export default function PinAccess({ selectedUser, onUnlock, onChangeUser }) {
   }
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    event.preventDefault(); // najważniejsze
+
     setErrorMessage('');
 
     if (!isSupabaseConfigured || !supabase) {
@@ -40,16 +41,18 @@ export default function PinAccess({ selectedUser, onUnlock, onChangeUser }) {
 
     setLoading(false);
 
-    if (error || !data) {
+    if (error) {
+      setErrorMessage('Nie udało się sprawdzić PIN-u.');
+      return;
+    }
+
+    if (!data) {
       setErrorMessage('Niepoprawny PIN.');
       return;
     }
 
-    localStorage.setItem('selectedUser', selectedUser);
-    localStorage.setItem('isUnlocked', 'true');
-
-    if (onUnlock) {
-      onUnlock(selectedUser);
+    if (onPinVerified) {
+      onPinVerified();
     }
 
     navigate('/mode');
@@ -79,6 +82,7 @@ export default function PinAccess({ selectedUser, onUnlock, onChangeUser }) {
           <Button type="submit" disabled={loading}>
             {loading ? 'Sprawdzanie...' : 'Wejdź'}
           </Button>
+
           <Button type="button" variant="secondary" onClick={onChangeUser}>
             Zmień użytkownika
           </Button>
