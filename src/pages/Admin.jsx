@@ -10,11 +10,33 @@ function escapeCsv(value) {
   return `"${stringValue.replace(/"/g, '""')}"`;
 }
 
+function getEntryType(entry) {
+  if (entry.testimony) return 'Świadectwo';
+  if (entry.question && entry.answer) return 'Pytanie i odpowiedź';
+  if (entry.fact) return 'Zaskakujący fakt';
+  if (entry.reflection) return 'Refleksja';
+  if (entry.custom_question || entry.custom_answer) return 'Własne pytanie / odpowiedź';
+  return 'Wpis';
+}
+
+function getMainContent(entry) {
+  if (entry.testimony) return entry.testimony;
+  if (entry.question && entry.answer) return `${entry.question} | ${entry.answer}`;
+  if (entry.fact) return entry.fact;
+  if (entry.reflection) return entry.reflection;
+  if (entry.custom_question || entry.custom_answer) {
+    return `${entry.custom_question || ''} | ${entry.custom_answer || ''}`.trim();
+  }
+  return '';
+}
+
 function createCsv(entries) {
   const headers = [
-    'created_at',
-    'author',
-    'partner',
+    'data',
+    'autor',
+    'rozmowca',
+    'typ_wpisu',
+    'tresc_glowna',
     'question',
     'answer',
     'fact',
@@ -28,19 +50,26 @@ function createCsv(entries) {
   ];
 
   const rows = entries.map((entry) =>
-    headers.map((header) => escapeCsv(entry[header])).join(',')
+    [
+      escapeCsv(entry.created_at),
+      escapeCsv(entry.author),
+      escapeCsv(entry.partner),
+      escapeCsv(getEntryType(entry)),
+      escapeCsv(getMainContent(entry)),
+      escapeCsv(entry.question),
+      escapeCsv(entry.answer),
+      escapeCsv(entry.fact),
+      escapeCsv(entry.reflection),
+      escapeCsv(entry.custom_question),
+      escapeCsv(entry.custom_answer),
+      escapeCsv(entry.testimony),
+      escapeCsv(entry.is_public),
+      escapeCsv(entry.is_highlighted),
+      escapeCsv(entry.is_private),
+    ].join(';')
   );
 
-  return [headers.join(','), ...rows].join('\n');
-}
-
-function getEntryType(entry) {
-  if (entry.testimony) return 'Świadectwo';
-  if (entry.question && entry.answer) return 'Pytanie i odpowiedź';
-  if (entry.fact) return 'Zaskakujący fakt';
-  if (entry.reflection) return 'Refleksja';
-  if (entry.custom_question || entry.custom_answer) return 'Własne pytanie / odpowiedź';
-  return 'Wpis';
+  return [headers.join(';'), ...rows].join('\n');
 }
 
 export default function Admin({ isAdminEmail = false }) {
@@ -175,7 +204,11 @@ export default function Admin({ isAdminEmail = false }) {
 
   const handleExportCsv = () => {
     const csv = createCsv(filteredEntries);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+    const blob = new Blob(['\uFEFF' + csv], {
+      type: 'text/csv;charset=utf-8;',
+    });
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
