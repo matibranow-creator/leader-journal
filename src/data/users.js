@@ -29,5 +29,4 @@ export const USERS = [
   'Wiktoria Wawrów',
   'Wojtek Dąbek',
   'Zuzanna Rudny',
-  'John Travolta',
 ];
