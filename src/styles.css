@@ -2,8 +2,17 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #0f172a;
-  background: #f8fafc;
+  color: #3d2a1e;
+  background: #fff7ed;
+  --bg: #fff7ed;
+  --surface: #ffffff;
+  --surface-soft: #fffbf5;
+  --accent: #f97316;
+  --accent-hover: #ea580c;
+  --text: #3d2a1e;
+  --muted: #8b6c50;
+  --border: #f3dec9;
+  --shadow: 0 10px 28px rgba(120, 74, 24, 0.1);
 }
 
 * {
@@ -12,8 +21,8 @@
 
 body {
   margin: 0;
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--bg);
+  color: var(--text);
 }
 
 a {
@@ -23,125 +32,235 @@ a {
 
 .app {
   min-height: 100vh;
-  padding: 20px 12px 48px;
+  padding: 26px 14px 56px;
 }
 
 .container {
-  width: min(980px, 100%);
+  width: min(1040px, 100%);
   margin: 0 auto;
 }
 
 .topbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding: 22px 18px;
+  border-radius: 20px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.brand {
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.logo-mark {
+  width: 74px;
+  height: 74px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 38px;
+  color: #c2410c;
+  background: rgba(249, 115, 22, 0.14);
+  border: 1px solid rgba(249, 115, 22, 0.32);
+  text-shadow: 12px 12px 0 rgba(123, 63, 19, 0.2);
+}
+
+.brand-title {
+  margin: 0;
+  font-size: clamp(26px, 4vw, 34px);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.brand-subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.topbar-meta {
+  display: grid;
+  justify-items: center;
   gap: 12px;
-  margin-bottom: 16px;
 }
 
 .topbar-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+  justify-content: center;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 6px 12px;
+  padding: 8px 14px;
   font-size: 14px;
-  background: #e2e8f0;
+  border: 1px solid var(--border);
+  background: #fff4e6;
+  color: #8a4b19;
 }
 
 .card {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-  padding: 20px;
+  background: var(--surface);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 26px;
+}
+
+.centered-card {
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .page-title {
-  margin: 0 0 4px;
-  font-size: 26px;
+  margin: 0 0 8px;
+  font-size: clamp(26px, 3.6vw, 34px);
 }
 
 .page-subtitle {
-  margin: 0 0 20px;
-  color: #475569;
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.section-title {
+  font-size: 23px;
+  margin-bottom: 2px;
 }
 
 .grid {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .users-grid {
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .partners-grid {
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .field {
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
 .field-label {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
+  color: #7a4e29;
 }
 
 .field-control {
   width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 12px;
-  padding: 11px 12px;
-  font-size: 15px;
-  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 13px 14px;
+  font-size: 16px;
+  background: #fffdf9;
 }
 
 .field-control:focus {
-  outline: 2px solid #94a3b8;
+  outline: 2px solid rgba(249, 115, 22, 0.35);
   outline-offset: 1px;
+  border-color: #f7c79b;
+}
+
+.question-list {
+  display: grid;
+  gap: 10px;
+}
+
+.question-card {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-soft);
+  color: var(--text);
+  padding: 14px;
+  font-size: 15px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.question-card:hover {
+  border-color: #f4b37c;
+  background: #fff4e8;
+}
+
+.question-card-selected {
+  border-color: #f8a160;
+  background: #fff1df;
+  box-shadow: inset 0 0 0 1px #f6b788;
+}
+
+.section-card {
+  background: #fff4e8;
+}
+
+.mode-option {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
 }
 
 .textarea {
   resize: vertical;
-  min-height: 110px;
+  min-height: 122px;
 }
 
 .btn {
   border: 0;
-  border-radius: 12px;
-  min-height: 44px;
-  padding: 10px 16px;
-  font-size: 15px;
+  border-radius: 14px;
+  min-height: 50px;
+  padding: 12px 18px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
 .btn-primary {
-  background: #0f172a;
+  background: var(--accent);
   color: #ffffff;
 }
 
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
 .btn-secondary {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #ffe8d2;
+  color: #8a4b19;
+}
+
+.btn-secondary:hover {
+  background: #ffdcb9;
 }
 
 .btn-ghost {
-  background: #f1f5f9;
-  color: #0f172a;
+  background: #fff2e2;
+  color: #8a4b19;
+}
+
+.btn-ghost:hover {
+  background: #ffe3c2;
 }
 
 .btn-danger {
@@ -151,17 +270,17 @@ a {
 
 .stack {
   display: grid;
-  gap: 14px;
+  gap: 18px;
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
 }
 
 .muted {
-  color: #64748b;
+  color: var(--muted);
   font-size: 14px;
 }
 
@@ -186,7 +305,7 @@ a {
   flex-wrap: wrap;
   gap: 6px 10px;
   font-size: 13px;
-  color: #475569;
+  color: var(--muted);
 }
 
 .mode-switch {
@@ -200,8 +319,8 @@ a {
   padding: 4px 9px;
   font-size: 12px;
   font-weight: 600;
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #ffe3c7;
+  color: #8a4b19;
 }
 
 .chip-highlight {
@@ -210,20 +329,41 @@ a {
 
 .divider {
   border: 0;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   margin: 8px 0;
 }
 
 @media (max-width: 640px) {
   .app {
-    padding: 14px 10px 30px;
+    padding: 16px 10px 34px;
+  }
+
+  .topbar {
+    padding: 16px 12px;
+    border-radius: 16px;
+  }
+
+  .logo-mark {
+    width: 62px;
+    height: 62px;
+    font-size: 30px;
+  }
+
+  .brand-title {
+    font-size: 25px;
   }
 
   .card {
-    padding: 14px;
+    padding: 16px;
+    border-radius: 16px;
   }
 
   .page-title {
-    font-size: 23px;
+    font-size: 24px;
+  }
+
+  .btn {
+    min-height: 48px;
+    width: 100%;
   }
 }

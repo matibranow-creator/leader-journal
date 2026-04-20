@@ -31,7 +31,6 @@ export const QUESTIONS = [
   'Za co jesteś dziś najbardziej wdzięczny?',
   'Co daje Ci poczucie sensu?',
   'Kiedy najbardziej czujesz, że żyjesz naprawdę?',
-  'Czy masz krótkie świadectwo, którym chciałbyś się podzielić?',
   'Jak zatytułowałbyś swoje życie?',
   'Jaką jedną radę dałbyś młodszej wersji siebie?',
   'Gdybyś miał miesiąc tylko dla siebie, co byś zrobił?',
