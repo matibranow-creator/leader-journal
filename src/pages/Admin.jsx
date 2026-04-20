@@ -202,20 +202,30 @@ export default function Admin({ isAdminEmail = false }) {
     setAuthError('Niepoprawny PIN.');
   };
 
-  const handleExportCsv = () => {
-    const csv = createCsv(filteredEntries);
+const handleExportCsv = () => {
+  const sortedEntries = [...filteredEntries].sort((a, b) => {
+    const authorA = String(a.author || '').localeCompare(String(b.author || ''), 'pl');
+    if (authorA !== 0) return authorA;
 
-    const blob = new Blob(['\uFEFF' + csv], {
-      type: 'text/csv;charset=utf-8;',
-    });
+    const partnerA = String(a.partner || '').localeCompare(String(b.partner || ''), 'pl');
+    if (partnerA !== 0) return partnerA;
 
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `entries-export-${new Date().toISOString().slice(0, 10)}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
+    return new Date(a.created_at) - new Date(b.created_at);
+  });
+
+  const csv = createCsv(sortedEntries);
+
+  const blob = new Blob(['\uFEFF' + csv], {
+    type: 'text/csv;charset=utf-8;',
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `entries-export-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
 
   if (!unlocked) {
     return (
