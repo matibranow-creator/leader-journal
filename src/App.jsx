@@ -5,7 +5,6 @@ import { QUESTIONS } from './data/questions';
 import { USERS } from './data/users';
 import Admin from './pages/Admin';
 import Form from './pages/Form';
-import Presentation from './pages/Presentation';
 import SelectPartner from './pages/SelectPartner';
 import SelectUser from './pages/SelectUser';
 
@@ -22,9 +21,6 @@ function Topbar({ selectedUser, onChangeUser }) {
         )}
       </div>
       <div className="topbar-actions">
-        <Link to="/presentation">
-          <Button variant="ghost">Widok prezentacyjny</Button>
-        </Link>
         <Link to="/admin">
           <Button variant="ghost">Admin</Button>
         </Link>
@@ -63,7 +59,6 @@ function AppContent() {
             element={<Form selectedUser={selectedUser} questions={QUESTIONS} />}
           />
           <Route path="/admin" element={<Admin />} />
-          <Route path="/presentation" element={<Presentation />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
