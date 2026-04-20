@@ -13,6 +13,7 @@ import SelectUser from './pages/SelectUser';
 import Testimony from './pages/Testimony';
 
 const SELECTED_USER_KEY = 'selectedUser';
+const PIN_VERIFIED_KEY = 'pinVerified';
 
 function Topbar({ selectedUser, onChangeUser }) {
   return (
@@ -43,38 +44,58 @@ function Topbar({ selectedUser, onChangeUser }) {
 }
 
 function AppContent() {
-  const [selectedUser, setSelectedUser] = useState(() => localStorage.getItem(SELECTED_USER_KEY) || '');
-  const [pinVerified, setPinVerified] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(
+    () => localStorage.getItem(SELECTED_USER_KEY) || ''
+  );
+
+  const [pinVerified, setPinVerified] = useState(
+    () => localStorage.getItem(PIN_VERIFIED_KEY) === 'true'
+  );
 
   useEffect(() => {
     if (selectedUser) {
       localStorage.setItem(SELECTED_USER_KEY, selectedUser);
-      return;
+    } else {
+      localStorage.removeItem(SELECTED_USER_KEY);
     }
-    localStorage.removeItem(SELECTED_USER_KEY);
   }, [selectedUser]);
+
+  useEffect(() => {
+    if (pinVerified) {
+      localStorage.setItem(PIN_VERIFIED_KEY, 'true');
+    } else {
+      localStorage.removeItem(PIN_VERIFIED_KEY);
+    }
+  }, [pinVerified]);
 
   const handleSelectUser = (user) => {
     setSelectedUser(user);
     setPinVerified(false);
+    localStorage.setItem(SELECTED_USER_KEY, user);
+    localStorage.removeItem(PIN_VERIFIED_KEY);
   };
 
   const handlePinVerified = () => {
     setPinVerified(true);
+    localStorage.setItem(PIN_VERIFIED_KEY, 'true');
   };
 
   const handleChangeUser = () => {
     setSelectedUser('');
     setPinVerified(false);
+    localStorage.removeItem(SELECTED_USER_KEY);
+    localStorage.removeItem(PIN_VERIFIED_KEY);
   };
 
   const guardedRoute = (element) => {
     if (!selectedUser) {
       return <Navigate to="/" replace />;
     }
+
     if (!pinVerified) {
       return <Navigate to="/pin" replace />;
     }
+
     return element;
   };
 
@@ -82,8 +103,13 @@ function AppContent() {
     <div className="app">
       <div className="container">
         <Topbar selectedUser={selectedUser} onChangeUser={handleChangeUser} />
+
         <Routes>
-          <Route path="/" element={<SelectUser users={USERS} onSelectUser={handleSelectUser} />} />
+          <Route
+            path="/"
+            element={<SelectUser users={USERS} onSelectUser={handleSelectUser} />}
+          />
+
           <Route
             path="/pin"
             element={
@@ -94,18 +120,34 @@ function AppContent() {
               />
             }
           />
-          <Route path="/mode" element={guardedRoute(<ModeSelect selectedUser={selectedUser} />)} />
-          <Route path="/testimony" element={guardedRoute(<Testimony selectedUser={selectedUser} />)} />
+
+          <Route
+            path="/mode"
+            element={guardedRoute(<ModeSelect selectedUser={selectedUser} />)}
+          />
+
+          <Route
+            path="/testimony"
+            element={guardedRoute(<Testimony selectedUser={selectedUser} />)}
+          />
+
           <Route
             path="/partner"
             element={guardedRoute(<SelectPartner users={USERS} selectedUser={selectedUser} />)}
           />
+
           <Route
             path="/questions"
             element={guardedRoute(<QuestionsList selectedUser={selectedUser} questions={QUESTIONS} />)}
           />
-          <Route path="/form" element={guardedRoute(<Form selectedUser={selectedUser} />)} />
+
+          <Route
+            path="/form"
+            element={guardedRoute(<Form selectedUser={selectedUser} />)}
+          />
+
           <Route path="/admin" element={<Admin />} />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

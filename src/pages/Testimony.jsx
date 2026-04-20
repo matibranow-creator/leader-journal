@@ -134,13 +134,8 @@ export default function Testimony({ selectedUser }) {
     <Card>
       <h1 className="page-title">Moje świadectwo</h1>
       <p className="page-subtitle">
-  Użytkownik:{' '}
-  <strong>
-    {selectedUser === 'Magdalena Łabaj'
-      ? 'Magdalena Łabaj — KCM ~K'
-      : selectedUser}
-  </strong>
-</p>
+        Użytkownik: <strong>{selectedUser}</strong>
+      </p>
 
       <div className="stack">
         <p className="muted">
