@@ -6,11 +6,12 @@ import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 
 export default function Login() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSubmit = async (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
@@ -20,41 +21,77 @@ export default function Login() {
       return;
     }
 
-    if (!email.trim()) {
-      setErrorMessage('Podaj adres email.');
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage('Podaj email i hasło.');
       return;
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
+
+    const { error } = await supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
+      password,
     });
+
     setLoading(false);
 
     if (error) {
-      setErrorMessage('Nie udało się wysłać kodu logowania.');
+      setErrorMessage('Niepoprawny email lub hasło.');
       return;
     }
 
-    setSuccessMessage('Kod logowania został wysłany na podany email.');
+    setSuccessMessage('Zalogowano.');
+  };
+
+  const handleSignup = async () => {
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage('Podaj email i hasło.');
+      return;
+    }
+
+    setLoading(true);
+
+    const { error } = await supabase.auth.signUp({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setErrorMessage('Nie udało się utworzyć konta.');
+      return;
+    }
+
+    setSuccessMessage('Konto utworzone. Możesz się zalogować.');
   };
 
   return (
     <Card className="centered-card">
       <h1 className="page-title">Logowanie</h1>
-      <p className="page-subtitle">Zaloguj się mailem i kodem, aby przejść do swoich wpisów.</p>
+      <p className="page-subtitle">Zaloguj się mailem i hasłem.</p>
 
-      <form className="stack" onSubmit={handleSubmit}>
+      <form className="stack" onSubmit={handleLogin}>
         <Input
           id="auth-email"
           label="Email"
           type="email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="twoj.email@example.com"
+          required
+        />
+
+        <Input
+          id="auth-password"
+          label="Hasło"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Twoje hasło"
           required
         />
 
@@ -62,7 +99,11 @@ export default function Login() {
         {successMessage && <p className="success">{successMessage}</p>}
 
         <Button type="submit" disabled={loading}>
-          {loading ? 'Wysyłanie...' : 'Wyślij kod'}
+          {loading ? 'Logowanie...' : 'Zaloguj'}
+        </Button>
+
+        <Button type="button" variant="ghost" onClick={handleSignup} disabled={loading}>
+          Zarejestruj
         </Button>
       </form>
     </Card>
