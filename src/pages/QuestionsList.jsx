@@ -4,8 +4,8 @@ import Button from '../components/Button';
 import Card from '../components/Card';
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 
-function draftStorageKey(authorEmail, partner) {
-  return `entryDraft:${authorEmail}:${partner}`;
+function draftStorageKey(author, partner) {
+  return `entryDraft:${author}:${partner}`;
 }
 
 function createEmptyDraft() {
@@ -18,13 +18,13 @@ function createEmptyDraft() {
   };
 }
 
-function readDraft(authorEmail, partner) {
-  if (!authorEmail || !partner) {
+function readDraft(author, partner) {
+  if (!author || !partner) {
     return createEmptyDraft();
   }
 
   try {
-    const raw = localStorage.getItem(draftStorageKey(authorEmail, partner));
+    const raw = localStorage.getItem(draftStorageKey(author, partner));
     if (!raw) {
       return createEmptyDraft();
     }
@@ -119,7 +119,7 @@ function parseSavedEntries(records) {
   return parsed;
 }
 
-export default function QuestionsList({ selectedUser, questions, authorEmail }) {
+export default function QuestionsList({ selectedUser, questions }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const partner = searchParams.get('partner') || '';
@@ -132,7 +132,7 @@ export default function QuestionsList({ selectedUser, questions, authorEmail }) 
   const [successMessage, setSuccessMessage] = useState('');
 
   const loadSavedEntries = async () => {
-    if (!isSupabaseConfigured || !supabase || !authorEmail || !partner) {
+    if (!isSupabaseConfigured || !supabase || !selectedUser || !partner) {
       return;
     }
 
@@ -140,7 +140,7 @@ export default function QuestionsList({ selectedUser, questions, authorEmail }) 
     const { data, error } = await supabase
       .from('entries')
       .select('*')
-      .eq('author', authorEmail)
+      .eq('author', selectedUser)
       .eq('partner', partner)
       .order('created_at', { ascending: false });
     setLoading(false);
@@ -154,16 +154,16 @@ export default function QuestionsList({ selectedUser, questions, authorEmail }) 
   };
 
   useEffect(() => {
-    setDraft(readDraft(authorEmail, partner));
+    setDraft(readDraft(selectedUser, partner));
     setErrorMessage('');
     setSuccessMessage('');
-  }, [authorEmail, partner]);
+  }, [selectedUser, partner]);
 
   useEffect(() => {
     loadSavedEntries();
-  }, [authorEmail, partner]);
+  }, [selectedUser, partner]);
 
-  if (!selectedUser || !authorEmail) {
+  if (!selectedUser) {
     return <Navigate to="/" replace />;
   }
 
@@ -215,7 +215,7 @@ export default function QuestionsList({ selectedUser, questions, authorEmail }) 
 
       const existing = savedData.questionRowsByText[question];
       const payload = {
-        author: authorEmail,
+        author: selectedUser,
         partner,
         question,
         answer: normalizedAnswer,
@@ -234,7 +234,7 @@ export default function QuestionsList({ selectedUser, questions, authorEmail }) 
 
     if (draft.fact.trim()) {
       const payload = {
-        author: authorEmail,
+        author: selectedUser,
         partner,
         question: null,
         answer: null,
@@ -253,7 +253,7 @@ export default function QuestionsList({ selectedUser, questions, authorEmail }) 
 
     if (draft.reflection.trim()) {
       const payload = {
-        author: authorEmail,
+        author: selectedUser,
         partner,
         question: null,
         answer: null,
@@ -272,7 +272,7 @@ export default function QuestionsList({ selectedUser, questions, authorEmail }) 
 
     if (draft.custom_question.trim() || draft.custom_answer.trim()) {
       const payload = {
-        author: authorEmail,
+        author: selectedUser,
         partner,
         question: null,
         answer: null,
@@ -319,7 +319,7 @@ export default function QuestionsList({ selectedUser, questions, authorEmail }) 
     }
 
     setSaving(false);
-    localStorage.removeItem(draftStorageKey(authorEmail, partner));
+    localStorage.removeItem(draftStorageKey(selectedUser, partner));
     setDraft(createEmptyDraft());
     setSuccessMessage('Wszystkie wpisy zostały zapisane.');
     loadSavedEntries();

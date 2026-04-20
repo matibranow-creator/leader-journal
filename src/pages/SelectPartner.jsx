@@ -14,7 +14,7 @@ function statusLabel(count) {
   return `${count} wpisy`;
 }
 
-export default function SelectPartner({ users, selectedUser, authorEmail }) {
+export default function SelectPartner({ users, selectedUser }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [statusByPartner, setStatusByPartner] = useState({});
@@ -29,7 +29,7 @@ export default function SelectPartner({ users, selectedUser, authorEmail }) {
   }, [users, selectedUser, query]);
 
   useEffect(() => {
-    if (!authorEmail || !isSupabaseConfigured || !supabase) {
+    if (!selectedUser || !isSupabaseConfigured || !supabase) {
       setStatusByPartner({});
       return;
     }
@@ -40,7 +40,7 @@ export default function SelectPartner({ users, selectedUser, authorEmail }) {
       const { data, error } = await supabase
         .from('entries')
         .select('partner')
-        .eq('author', authorEmail);
+        .eq('author', selectedUser);
 
       if (ignore || error) {
         return;
@@ -58,7 +58,7 @@ export default function SelectPartner({ users, selectedUser, authorEmail }) {
     return () => {
       ignore = true;
     };
-  }, [authorEmail]);
+  }, [selectedUser]);
 
   if (!selectedUser) {
     return <Navigate to="/" replace />;

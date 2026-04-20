@@ -4,28 +4,28 @@ import Button from '../components/Button';
 import Card from '../components/Card';
 import Input from '../components/Input';
 
-function testimonyKey(authorEmail) {
-  return `testimonyDraft:${authorEmail}`;
+function testimonyKey(user) {
+  return `testimonyDraft:${user}`;
 }
 
-export default function Testimony({ selectedUser, authorEmail }) {
+export default function Testimony({ selectedUser }) {
   const navigate = useNavigate();
   const [testimony, setTestimony] = useState('');
   const [savedMessage, setSavedMessage] = useState('');
 
   useEffect(() => {
-    if (!authorEmail) {
+    if (!selectedUser) {
       return;
     }
-    setTestimony(localStorage.getItem(testimonyKey(authorEmail)) || '');
-  }, [authorEmail]);
+    setTestimony(localStorage.getItem(testimonyKey(selectedUser)) || '');
+  }, [selectedUser]);
 
-  if (!selectedUser || !authorEmail) {
+  if (!selectedUser) {
     return <Navigate to="/" replace />;
   }
 
   const handleSave = () => {
-    localStorage.setItem(testimonyKey(authorEmail), testimony);
+    localStorage.setItem(testimonyKey(selectedUser), testimony);
     setSavedMessage('Twoje świadectwo zostało zapisane');
   };
 

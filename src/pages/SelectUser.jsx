@@ -18,7 +18,7 @@ export default function SelectUser({ users, onSelectUser }) {
 
   const handlePick = (user) => {
     onSelectUser(user);
-    navigate('/mode');
+    navigate('/pin');
   };
 
   return (

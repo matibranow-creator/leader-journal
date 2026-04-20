@@ -7,8 +7,8 @@ import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 
 const ENTRY_TYPES = new Set(['question', 'fact', 'reflection', 'custom']);
 
-function draftStorageKey(authorEmail, partner) {
-  return `entryDraft:${authorEmail}:${partner}`;
+function draftStorageKey(author, partner) {
+  return `entryDraft:${author}:${partner}`;
 }
 
 function createEmptyDraft() {
@@ -21,13 +21,13 @@ function createEmptyDraft() {
   };
 }
 
-function readDraft(authorEmail, partner) {
-  if (!authorEmail || !partner) {
+function readDraft(author, partner) {
+  if (!author || !partner) {
     return createEmptyDraft();
   }
 
   try {
-    const raw = localStorage.getItem(draftStorageKey(authorEmail, partner));
+    const raw = localStorage.getItem(draftStorageKey(author, partner));
     if (!raw) {
       return createEmptyDraft();
     }
@@ -44,15 +44,15 @@ function readDraft(authorEmail, partner) {
   }
 }
 
-function writeDraft(authorEmail, partner, draft) {
-  localStorage.setItem(draftStorageKey(authorEmail, partner), JSON.stringify(draft));
+function writeDraft(author, partner, draft) {
+  localStorage.setItem(draftStorageKey(author, partner), JSON.stringify(draft));
 }
 
 function hasQuestionDraft(draft, question) {
   return Object.prototype.hasOwnProperty.call(draft.questionAnswers || {}, question);
 }
 
-export default function Form({ selectedUser, authorEmail }) {
+export default function Form({ selectedUser }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const partner = searchParams.get('partner') || '';
@@ -68,14 +68,14 @@ export default function Form({ selectedUser, authorEmail }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!authorEmail || !partner) {
+    if (!selectedUser || !partner) {
       return;
     }
 
     let ignore = false;
 
     const load = async () => {
-      const draft = readDraft(authorEmail, partner);
+      const draft = readDraft(selectedUser, partner);
 
       if (entryType === 'question') {
         if (hasQuestionDraft(draft, selectedQuestion)) {
@@ -92,7 +92,7 @@ export default function Form({ selectedUser, authorEmail }) {
         const { data } = await supabase
           .from('entries')
           .select('answer')
-          .eq('author', authorEmail)
+          .eq('author', selectedUser)
           .eq('partner', partner)
           .eq('question', selectedQuestion)
           .order('created_at', { ascending: false })
@@ -119,7 +119,7 @@ export default function Form({ selectedUser, authorEmail }) {
         const { data } = await supabase
           .from('entries')
           .select('fact')
-          .eq('author', authorEmail)
+          .eq('author', selectedUser)
           .eq('partner', partner)
           .not('fact', 'is', null)
           .order('created_at', { ascending: false })
@@ -146,7 +146,7 @@ export default function Form({ selectedUser, authorEmail }) {
         const { data } = await supabase
           .from('entries')
           .select('reflection')
-          .eq('author', authorEmail)
+          .eq('author', selectedUser)
           .eq('partner', partner)
           .not('reflection', 'is', null)
           .order('created_at', { ascending: false })
@@ -174,7 +174,7 @@ export default function Form({ selectedUser, authorEmail }) {
       const { data } = await supabase
         .from('entries')
         .select('custom_question, custom_answer')
-        .eq('author', authorEmail)
+        .eq('author', selectedUser)
         .eq('partner', partner)
         .or('custom_question.not.is.null,custom_answer.not.is.null')
         .order('created_at', { ascending: false })
@@ -191,9 +191,9 @@ export default function Form({ selectedUser, authorEmail }) {
     return () => {
       ignore = true;
     };
-  }, [authorEmail, partner, entryType, selectedQuestion]);
+  }, [selectedUser, partner, entryType, selectedQuestion]);
 
-  if (!selectedUser || !authorEmail) {
+  if (!selectedUser) {
     return <Navigate to="/" replace />;
   }
 
@@ -219,7 +219,7 @@ export default function Form({ selectedUser, authorEmail }) {
   }, [entryType]);
 
   const handleBack = () => {
-    const draft = readDraft(authorEmail, partner);
+    const draft = readDraft(selectedUser, partner);
 
     if (entryType === 'question') {
       draft.questionAnswers = draft.questionAnswers || {};
@@ -233,7 +233,7 @@ export default function Form({ selectedUser, authorEmail }) {
       draft.custom_answer = customAnswer;
     }
 
-    writeDraft(authorEmail, partner, draft);
+    writeDraft(selectedUser, partner, draft);
     navigate(`/questions?partner=${encodeURIComponent(partner)}`);
   };
 
