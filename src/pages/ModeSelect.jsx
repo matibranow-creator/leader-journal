@@ -1,9 +1,17 @@
+import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import Card from '../components/Card';
+import { RELATION_QUOTES } from '../data/quotes';
 
 export default function ModeSelect({ selectedUser }) {
   const navigate = useNavigate();
+  const [quote, setQuote] = useState(null);
+
+  useEffect(() => {
+    const random = RELATION_QUOTES[Math.floor(Math.random() * RELATION_QUOTES.length)];
+    setQuote(random);
+  }, []);
 
   if (!selectedUser) {
     return <Navigate to="/" replace />;
@@ -11,6 +19,13 @@ export default function ModeSelect({ selectedUser }) {
 
   return (
     <Card>
+      {quote && (
+        <div className="quote-box">
+          <p className="quote-text">"{quote.text}"</p>
+          <p className="quote-ref">{quote.ref}</p>
+        </div>
+      )}
+
       <h1 className="page-title">Wybierz tryb</h1>
       <p className="page-subtitle">
         Aktualny użytkownik: <strong>{selectedUser}</strong>
@@ -26,7 +41,8 @@ export default function ModeSelect({ selectedUser }) {
             Nie jest to obowiązkowe, jeśli nie czujesz potrzeby po prostu pomiń ten krok.
           </span>
           <span className="muted">
-            Jeśli jednak chcesz się tym podzielić napisz tak jak czujesz, własnymi słowami, bez spiny, nie musi to być idealne.
+            Jeśli jednak chcesz się tym podzielić napisz tak jak czujesz, własnymi słowami, bez spiny, nie musi to być
+            idealne.
           </span>
           <span className="muted">Czasem łatwiej coś napisać niż powiedzieć 🐺</span>
         </button>

@@ -284,6 +284,26 @@ a {
   font-size: 14px;
 }
 
+.quote-box {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border-left: 3px solid #ddd;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.quote-text {
+  font-style: italic;
+  color: #444;
+  margin: 0;
+}
+
+.quote-ref {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
 .error {
   color: #b91c1c;
   font-size: 14px;

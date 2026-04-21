@@ -1,0 +1,22 @@
+export const RELATION_QUOTES = [
+  { text: "Miłujcie się wzajemnie, jak Ja was umiłowałem", ref: "J 13,34" },
+  { text: "Jeden drugiego brzemiona noście", ref: "Ga 6,2" },
+  { text: "Gdzie są dwaj albo trzej zebrani w imię moje, tam jestem pośród nich", ref: "Mt 18,20" },
+  { text: "Bądźcie dla siebie nawzajem dobrzy i miłosierni", ref: "Ef 4,32" },
+  { text: "Z pokorą oceniajcie jedni drugich za wyżej stojących od siebie", ref: "Flp 2,3" },
+  { text: "Wszystko niech się dokonuje w miłości", ref: "1 Kor 16,14" },
+  { text: "Miłość cierpliwa jest, łaskawa jest", ref: "1 Kor 13,4" },
+  { text: "Nie szuka swego", ref: "1 Kor 13,5" },
+  { text: "Jedni drugich w miłości znosząc", ref: "Ef 4,2" },
+  { text: "Przyjmujcie jedni drugich, jak i Chrystus was przyjął", ref: "Rz 15,7" },
+  { text: "Niech każdy ma na oku nie tylko swoje własne sprawy, ale też i drugich", ref: "Flp 2,4" },
+  { text: "Pokój mój daję wam", ref: "J 14,27" },
+  { text: "Błogosławieni, którzy wprowadzają pokój", ref: "Mt 5,9" },
+  { text: "Kto trwa w miłości, trwa w Bogu", ref: "1 J 4,16" },
+  { text: "Miłuj bliźniego swego jak siebie samego", ref: "Mt 22,39" },
+  { text: "Służcie sobie nawzajem w miłości", ref: "Ga 5,13" },
+  { text: "budujcie jeden drugiego", ref: "1 Tes 5,11" },
+  { text: "Niech wasza mowa będzie zawsze życzliwa", ref: "Kol 4,6" },
+  { text: "Bądźcie jednomyślni, współczujący, pełni braterskiej miłości", ref: "1 P 3,8" },
+  { text: "Uczcie się ode Mnie, bo jestem cichy i pokorny sercem", ref: "Mt 11,29" }
+];
